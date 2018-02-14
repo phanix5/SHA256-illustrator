@@ -10,13 +10,13 @@ var initState = {
 	mousePos: { x: 0, y: 0 },
 	block1: {isOpen:false,msg:''},
 	block2: {isOpen:false,
-			blockStyle:{height: 80},
+			blockStyle:{height: 80,width:700},
 			msgSplit: [],
 			hex: resize([''], 64, '')	},
 	block3:{isOpen:false,
-			blockStyle:{height: 80} },
+			blockStyle:{height: 80,width:700} },
 	block4:{isOpen:false,
-			blockStyle:{height: 80,width: 700}}
+			blockStyle:{height: 80,width:700}}
 };
 
 class App extends React.Component {
@@ -92,7 +92,7 @@ class App extends React.Component {
 			if (this.state.msg.length>0 && this.state.msg.length<9) {
 				this.setState((prevState) => {
 					prevState.block2.isOpen = true;
-					prevState.block2.blockStyle = { height: spring(600, presets.noWobble)};
+					prevState.block2.blockStyle = { height: spring(600, presets.noWobble),width:700};
 					prevState.block2.msgSplit=msgSplit;
 					prevState.block2.hex = hex;
 					return prevState
@@ -102,7 +102,7 @@ class App extends React.Component {
 	onClickBlock3(){
 		this.setState((prevState) => {
 			prevState.block3.isOpen=true;
-			prevState.block3.blockStyle={ height: spring(700, presets.noWobble)};
+			prevState.block3.blockStyle={ height: spring(700, presets.noWobble),width:700};
 			return prevState;
 		});
 	}
@@ -209,10 +209,11 @@ class Block extends React.Component {
 
 	render() {
 		return (
-			<div style={this.props.style} className="block2">
+			
+			<div style={this.props.style}>
 				<Motion style={this.props.blockState.blockStyle}>
 					{transitionStyle =>
-						<div id="block2" className="block outerBlockShadow" onClick={this.props.onClick} style={transitionStyle}>
+						<div id="block2" className="block outerBlockShadow" onClick={this.props.onClick} style={Object.assign({left: -transitionStyle.width/2},transitionStyle)}>
 							<div style={this.props.blockState.isOpen ? {} : { display: 'none' }}>{this.props.children}</div>
 						</div>
 					}
