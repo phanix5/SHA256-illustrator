@@ -4,6 +4,11 @@ function resize(arrr, size, defval) {
     while (arr.length < size) { arr.push(defval); }
     return arr;
 }
+
+function padZeros(n,size){
+    var pad=new Array(size+1).join('0');
+    return (pad+n).slice(-pad.length);
+}
 function preProcess(msg){
     msg += String.fromCharCode(0x80);  // add trailing '1' bit (+ 0's padding) to string [§5.1.1]
 
@@ -38,4 +43,27 @@ function bitRepresentation(msg){
     return s;
 }
 
-export {resize,preProcess,bitRepresentation};
+function safe_add (x, y) {
+	var lsw = (x & 0xFFFF) + (y & 0xFFFF);
+	var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+	return (msw << 16) | (lsw & 0xFFFF);
+}
+function S (X, n) { return ( X >>> n ) | (X << (32 - n)); }
+function R (X, n) { return ( X >>> n ); }
+function Ch(x, y, z) { return ((x & y) ^ ((~x) & z)); }
+function Maj(x, y, z) { return ((x & y) ^ (x & z) ^ (y & z)); }
+function Sigma0256(x) { return (S(x, 2) ^ S(x, 13) ^ S(x, 22)); }
+function Sigma1256(x) { return (S(x, 6) ^ S(x, 11) ^ S(x, 25)); }
+function Gamma0256(x) { return (S(x, 7) ^ S(x, 18) ^ R(x, 3)); }
+function Gamma1256(x) { return (S(x, 17) ^ S(x, 19) ^ R(x, 10)); }
+
+function generateMessageSchedule(m){
+    let W=[];
+    for ( var j = 0; j<64; j++) {
+        if (j < 16) W[j] = m[0][j];
+        else W[j] = safe_add(safe_add(safe_add(Gamma1256(W[j - 2]), W[j - 7]), Gamma0256(W[j - 15])), W[j - 16]);
+    }
+    return W;
+}
+
+export {resize,padZeros,preProcess,bitRepresentation,generateMessageSchedule};

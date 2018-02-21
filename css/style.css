@@ -81,6 +81,7 @@
     margin: 0 auto;
     padding: 15px;
     padding-bottom: 5px;
+    font-size: 20px;
 }
 
 .text2{
@@ -120,7 +121,11 @@
     height: 200px;
     background-color: rgb(211, 56, 56);
     border-radius: 2px;
+    padding:10px;
     z-index: 1;
+    font-size: 17px;
+    text-align: left;
+
 }
 .leftArrow{
     width: 0px;
@@ -145,4 +150,50 @@
 .dropShadow{
     -webkit-filter: drop-shadow(8px 4px 10px rgba(0, 0, 0,0.3));
     filter: drop-shadow(8px 4px 10px rgba(0, 0, 0,0.3));
+}
+
+.gridWrapper{
+  display: grid;
+  grid-template-columns: 4fr 1fr 4fr;
+  grid-gap: 20px;
+  grid-auto-rows: 100px;
+  margin: 20px;
+  float: left;
+}
+.innerBlock{
+    height: 100%;
+    width:100%;
+    grid-row: 1/span 5;
+    background-color: rgb(139, 28, 28);
+    text-align: center;
+}
+.innerButton{
+    height: 50px;
+    width: 100%;
+    grid-row-start: 3;
+    background-color: rgb(139, 28, 28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.tableContainer{
+    display: grid;
+    grid-gap: 5px;
+    grid-auto-rows: 30px;
+    
+}
+.tableItem{
+    background-color: aliceblue;
+}
+
+.button{
+    height:40px;
+    width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 50px;
+    margin: 20px auto;
+    background-color: blueviolet;
+    cursor: pointer;
 }
