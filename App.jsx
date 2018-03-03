@@ -1,18 +1,21 @@
 import React from 'react';
-import { Motion, StaggeredMotion, spring, presets } from 'react-motion'
+import { Motion, StaggeredMotion, spring, presets } from 'react-motion';
 import { SHA256, str2binb, Utf8Encode, binb2hex } from './sha256';
-import { resize, padZeros, preProcess, bitRepresentation, generateMessageSchedule } from './Util';
+import { resize, padZeros, preProcess, bitRepresentation, generateMessageSchedule, putSpaces } from './Util';
 
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
+
+
+var highLight = 70;
 
 var initState = {
 	msg: '',
 	mousePos: { x: 0, y: 0 },
+	highLight: -50,
 	block1: { isOpen: false, msg: '' },
 	block2: {
 		isOpen: false,
 		blockStyle: { height: 80, width: 700 },
-		msgSplit: resize([''],8,''),
+		msgSplit: resize([''], 8, ''),
 		intArr: resize([''], 64, ''),
 		hexArr: resize([''], 64, '')
 	},
@@ -24,8 +27,14 @@ var initState = {
 		isOpen: false,
 		blockStyle: { height: 80, width: 700 },
 		msgSch: resize([''], 16, '')
+	},
+	block5: {
+		isOpen: false,
+		blockStyle: { height: 80, width: 700 },
 	}
 };
+
+
 
 class App extends React.Component {
 	constructor(props) {
@@ -53,12 +62,14 @@ class App extends React.Component {
 				? {
 
 					x: spring(this.state.mousePos.x, presets.noWobble),
-					y: spring(this.state.mousePos.y, presets.noWobble)
+					y: spring(this.state.mousePos.y, presets.noWobble),
+					highLight: spring(this.state.highLight)
 				}
 				: {
 
 					x: spring(prevStyles[i - 1].x, presets.stiff),
-					y: spring(prevStyles[i - 1].y, presets.stiff)
+					y: spring(prevStyles[i - 1].y, presets.stiff),
+					highLight: spring(prevStyles[i - 1].highLight, presets.stiff)
 				};
 		});
 		return endvalue;
@@ -78,23 +89,29 @@ class App extends React.Component {
 	updateBlocks(msg) {
 		this.setState((prevState) => {
 			prevState.msg = msg;
+			prevState.highLight = prevState.highLight < 0 ? 50 : -50;
 			prevState.block2 = this.updateBlock2(msg, prevState.block2);
 			prevState.block4 = this.updateBlock4(msg, prevState.block4);
+			prevState.block5 = this.updateBlock5(msg, prevState.block5);
 			return prevState;
 		});
 	}
 
 	updateBlock2(msg, block) {
 		block.msgSplit = msg.split('');
-		let intArr= preProcess(Utf8Encode(msg));
+		let intArr = preProcess(Utf8Encode(msg));
 		block.intArr = intArr[0];
-		block.hexArr=block.intArr.map((item, _) => padZeros((item >>> 0).toString(16), 8));
+		block.hexArr = block.intArr.map((item, _) => padZeros((item >>> 0).toString(16), 8));
 		return block;
 	}
 
 	updateBlock4(msg, block) {
 		let msgSch = generateMessageSchedule(preProcess(Utf8Encode(msg)));
 		block.msgSch = msgSch.map((item, _) => padZeros((item >>> 0).toString(16), 8));
+		return block;
+	}
+
+	updateBlock5(msg, block){
 		return block;
 	}
 
@@ -111,9 +128,10 @@ class App extends React.Component {
 	onClickBlock3() {
 		this.setState((prevState) => {
 			prevState.block3.isOpen = true;
-			prevState.block3.blockStyle = { 
+			prevState.block3.blockStyle = {
 				height: spring(750, presets.noWobble),
-				width: spring(900,presets.noWobble) };
+				width: spring(900, presets.noWobble)
+			};
 			return prevState;
 		});
 	}
@@ -122,50 +140,42 @@ class App extends React.Component {
 			prevState.block4.isOpen = true;
 			prevState.block4.blockStyle = {
 				height: spring(700, presets.noWobble),
-				width: spring(1500, presets.noWobble)
+				width: spring(1200, presets.noWobble)
 			};
 			prevState.block4.hexArray = preProcess(Utf8Encode(this.state.msg)).map((item, _) => item.toString(16));
 			return prevState;
 		});
 	}
 
+	onClickBlock5(){
+		this.setState((prevState) => {
+			prevState.block5.isOpen = true;
+			prevState.block5.blockStyle = {
+				height: spring(750, presets.noWobble),
+				width: spring(1300, presets.noWobble)
+			};
+			return prevState;
+		});
+	}
+
 	getComponentStyle(style, index) {
-		switch (index) {
-			case 0:
-				return {
-					WebkitTransform: `translate3d(${style.x}px, ${style.y}px, 0)`,
-					transform: `translate3d(${style.x}px, ${style.y}px, 0)`,
-				};
-			case 1:
-				return {
-					WebkitTransform: `translate3d(${style.x}px, ${style.y}px, 0)`,
-					transform: `translate3d(${style.x}px, ${style.y}px, 0)`
-				};
-			case 2:
-				return {
-					WebkitTransform: `translate3d(${style.x}px, ${style.y}px, 0)`,
-					transform: `translate3d(${style.x}px, ${style.y}px, 0)`
-				};
-			case 3:
-				return {
-					WebkitTransform: `translate3d(${style.x}px, ${style.y}px, 0)`,
-					transform: `translate3d(${style.x}px, ${style.y}px, 0)`
-				};
-			case 4:
-				return {
-					WebkitTransform: `translate3d(${style.x}px, ${style.y}px, 0)`,
-					transform: `translate3d(${style.x}px, ${style.y}px, 0)`,
-					textAlign: 'center'
-				};
-		}
+		var r = Math.round(165 + 50 - Math.abs(style.highLight));
+		var g = Math.round(32 + 50 - Math.abs(style.highLight));
+		var b = Math.round(32 + 50 - Math.abs(style.highLight));
+		//console.log(b);
+		return {
+			WebkitTransform: `translate3d(${style.x}px, ${style.y}px, 0)`,
+			transform: `translate3d(${style.x}px, ${style.y}px, 0)`,
+			backgroundColor: `rgb(${r},${g},${b})`
+		};
 
 	}
 
 	render() {
 		return (
 			<div>
-				<StaggeredMotion defaultStyles={[{ x: 0, y: 0 }, { x: 0, y: 20 }, { x: 0, y: 40 },
-				{ x: 0, y: 60 }, { x: 0, y: 80 }]}
+				<StaggeredMotion defaultStyles={[{ x: 0, y: 0, highLight: -50 }, { x: 0, y: 20, highLight: -50 }, { x: 0, y: 40, highLight: -50 },
+				{ x: 0, y: 60, highLight: -50 }, { x: 0, y: 80, highLight: -50 }]}
 					styles={this.getStyles.bind(this)}>
 					{interpolatedStyles =>
 						<div>
@@ -185,7 +195,8 @@ class App extends React.Component {
 										return (<Block4 key={i} blockState={this.state.block4} onClick={this.onClickBlock4.bind(this)}
 											style={this.getComponentStyle(style, i)} />);
 									case 4:
-									//return (<OutputHash key={i} value={this.state.hash} style={this.getComponentStyle(style, i)} />);
+										return (<Block5 key={i} blockState={this.state.block5} onClick={this.onClickBlock5.bind(this)}
+											style={this.getComponentStyle(style, i)} />);
 								}
 							}
 
@@ -208,7 +219,7 @@ class Block1 extends React.Component {
 		return (
 			<div style={this.props.style} id="block1" className="block outerBlockShadow">
 				<div className="element">
-					<input type="text" className="textBox1" value={this.props.value} onChange={this.props.handleChange} />
+					<input type="text" className="textBox1" placeholder="SHA Illustrator" value={this.props.value} onChange={this.props.handleChange} />
 				</div>
 			</div>
 		);
@@ -222,12 +233,14 @@ class Block extends React.Component {
 	}
 
 	render() {
+		var style = this.props.style;
+		var bgColor = style.backgroundColor;
+		delete style.backgroundColor;
 		return (
-
-			<div style={this.props.style}>
+			<div style={style}>
 				<Motion style={this.props.blockState.blockStyle}>
 					{transitionStyle =>
-						<div id="block2" className="block outerBlockShadow" onClick={this.props.onClick} style={Object.assign({ left: -transitionStyle.width / 2 }, transitionStyle)}>
+						<div id="block2" className="block outerBlockShadow" onClick={this.props.onClick} style={Object.assign({ left: -transitionStyle.width / 2, backgroundColor: bgColor }, transitionStyle)}>
 							<div style={this.props.blockState.isOpen ? {} : { display: 'none' }}>{this.props.children}</div>
 						</div>
 					}
@@ -243,7 +256,7 @@ class Block2 extends React.Component {
 	// PREPROCESSING 
 	constructor(props) {
 		super(props);
-		this.state={
+		this.state = {
 			isInt: true
 		}
 	}
@@ -263,66 +276,45 @@ class Block2 extends React.Component {
 		return endvalue;
 	}
 
-	getInfoComponentStyles(style, index) {
-		switch (index) {
-			case 0:
-				return {
-					WebkitTransform: `rotateY(${style.rotateY}deg)`,
-					transform: `rotateY(${style.rotateY}deg)`,
-					display: 'flex'
-				};
-			case 1:
-				return {
-					WebkitTransform: `rotateY(${style.rotateY}deg)`,
-					transform: `rotateY(${style.rotateY}deg)`,
-					display: 'flex'
-				};
-			case 2:
-				return {
-					WebkitTransform: `rotateY(${style.rotateY}deg)`,
-					transform: `rotateY(${style.rotateY}deg)`,
-					display: 'flex'
-				};
-		}
-	}
 
-	infoBlockButtonClickHandler(_){
-		this.setState((prevState)=>{
-			if(prevState.isInt){
-				prevState.isInt=false;
-			}else{
-				prevState.isInt=true;
+	infoBlockButtonClickHandler(_) {
+		this.setState((prevState) => {
+			if (prevState.isInt) {
+				prevState.isInt = false;
+			} else {
+				prevState.isInt = true;
 			}
 		})
 	}
-	getInfoBlock1(i,style){
-		return (
-		<InfoBlock key={i} style={{ left: '670px', top: '80px' }} contentStyle={{height:'250px',width:'250px'}} rot={this.getInfoComponentStyles(style, i)} leftArrow={{}} rightArrow={{ display: 'none' }}>
-			 Your UTF-8 encoded message. But why the encoding it tho? well different machines use different encoding so the character 'i' in Windows-1252 is Byte ED and in UTF-8 is Bytes C3 AD. So you end up with different hashes for the same character as SHA cares only about the bytes its fed. And since UTF-8 supports characters outside the standart ASCII charset, it is usually used in preprocessing the message. 
-		</InfoBlock>
-		);
-	}
+	getInfoBlock(i, style) {
+		switch (i) {
+			case 0:
+				return (
+					<InfoBlock key={i} style={{ left: '670px', top: '80px' }} contentStyle={{ height: '250px', width: '250px' }} rotStyle={style} leftArrow={{}} rightArrow={{ display: 'none' }}>
+						Your UTF-8 encoded message. But why the encoding tho? well different machines use different encoding so the character 'i' in Windows-1252 is Byte ED and in UTF-8 is Bytes C3 AD. So you end up with different hashes for the same character as SHA cares only about the bytes its fed. And since UTF-8 supports characters outside the standart ASCII charset, it is usually used in preprocessing the message.
+				</InfoBlock>
+				);
+			case 1:
+				return (
+					<InfoBlock key={i} style={{ right: '670px', top: '270px' }} contentStyle={{ height: '280px', width: '280px' }} rotStyle={style} leftArrow={{ display: 'none' }} rightArrow={{}}>
+						<div>The 512-bit message block is split into sixteen integers of 32-bit 'words'. You are looking at the integer values represented by each of the 32 bit blocks from your message.<br />You can use the toggle button below to switch between integer and hex values.</div>
+						<Button label={'Toggle'} onClick={this.infoBlockButtonClickHandler.bind(this)} />
+					</InfoBlock>
+				);
+			case 2:
+				return (
+					<InfoBlock key={i} style={{ left: '670px', top: '400px' }} contentStyle={{ height: '180px', width: '230px' }} rotStyle={style} leftArrow={{}} rightArrow={{ display: 'none' }}>
+						The last integer block is reserved to insert the length of the initial message. This ensures small messages (512 bits) do not end with similar hashes.<br /><br />Hey! type in 'aaaa' in the input text and notice the second integer is negative. Can you guess why?
+				</InfoBlock>
+				);
+		}
 
-	getInfoBlock2(i,style){
-		return (
-		<InfoBlock key={i} style={{ right: '670px', top: '270px' }} contentStyle={{height:'280px',width:'280px'}} rot={this.getInfoComponentStyles(style, i)} leftArrow={{ display: 'none' }} rightArrow={{}}>
-			<div>The 512-bit message block is split into sixteen integers of 32-bit 'words'. You are looking at the integer values represented by each of the 32 bit blocks from your message.<br/>You can use the toggle button below to switch between integer and hex values.</div>
-			<Button label={'Toggle'} onClick={this.infoBlockButtonClickHandler.bind(this)} />
-		</InfoBlock>
-		);
-	}
-	getInfoBlock3(i,style){
-		return (
-		<InfoBlock key={i} style={{ left: '670px', top: '400px' }} contentStyle={{height:'180px',width:'230px'}} rot={this.getInfoComponentStyles(style, i)} leftArrow={{}} rightArrow={{ display: 'none' }}>
-			 The last integer block is reserved to insert the length of the initial message. This ensures small messages (512 bits) do not end with similar hashes.<br/><br/>Hey! type in 'aaaa' in the input text and notice the second integer is negative. Can you guess why?
-		</InfoBlock>
-		);
 	}
 
 	render() {
 		let len = this.props.blockState.msgSplit.length;
 		let msgSplit = resize(this.props.blockState.msgSplit, 8, '');
-		let msgBlockArr=this.state.isInt ? this.props.blockState.intArr:this.props.blockState.hexArr;
+		let msgBlockArr = this.state.isInt ? this.props.blockState.intArr : this.props.blockState.hexArr;
 		//console.log(this.props.blockState.intArr);
 		return (
 			<Block blockState={this.props.blockState} style={this.props.style} onClick={this.props.onClick}>
@@ -333,9 +325,9 @@ class Block2 extends React.Component {
 					{msgSplit.map((item, index) => <input type='text' key={index} className="textBox" value={item} readOnly />)}
 				</div>
 				<div className="element">
-					<div className="text2">The message you've provided has {len} characters. That's {len * 8} bits which will need to be padded to 512 bits. So how's that done? First a single 1 bit is appended to the message. Then the next 512 - {8 * len} -1 - 64 = {512 - 65 - 8 * len} bits are set to zeros. The last 64 bits are reserved to add the size of the initial message.</div>
+					<div className="text2">The message you've provided has {len} characters. That's {len * 8} bits which will need to be padded to 512 bits. How's that done? First a single 1 bit is appended to the message. Then the next 512 - {8 * len} -1 - 64 = {512 - 65 - 8 * len} bits are set to zeros. The last 64 bits are reserved to add the size of the initial message. Each word is labelled as M<sub>1</sub>, M<sub>2</sub>,  M<sub>3</sub> etc.</div>
 				</div>
-				
+
 				<div className="element">
 					<div>{msgBlockArr.slice(0, 4).map((item, index) => <input type='text' key={index} className="textBox2" value={item} readOnly />)}</div>
 					<div>{msgBlockArr.slice(4, 8).map((item, index) => <input type='text' key={index} className="textBox2" value={item} readOnly />)}</div>
@@ -349,21 +341,11 @@ class Block2 extends React.Component {
 					{interpoStyles =>
 						<div>
 							{interpoStyles.map((style, i) => {
-								switch (i) {
-									case 0:
-										//console.log(style.rotateY);
-										return this.getInfoBlock1(i,style);
-									case 1:
-										return this.getInfoBlock2(i,style);
-									case 2:
-										return this.getInfoBlock3(i,style);
-								}
-							}
-							)}
+								return this.getInfoBlock(i, style);
+							})}
 						</div>
 					}
 				</StaggeredMotion>
-
 			</Block>
 
 		);
@@ -384,8 +366,41 @@ class Block3 extends React.Component {
 				'a2bfe8a1', 'a81a664b', 'c24b8b70', 'c76c51a3', 'd192e819', 'd6990624', 'f40e3585', '106aa070',
 				'19a4c116', '1e376c08', '2748774c', '34b0bcb5', '391c0cb3', '4ed8aa4a', '5b9cca4f', '682e6ff3',
 				'748f82ee', '78a5636f', '84c87814', '8cc70208', '90befffa', 'a4506ceb', 'bef9a3f7', 'c67178f2'],
-			initialHash: ['{H<sub>1</sub>}', '6a09e667', 'H', 'bb67ae85', 'H', '3c6ef372', 'H', 'a54ff53a', 'H', '510e527f', 'H', '9b05688c', 'H', '1f83d9ab', 'H', '5be0cd19']
+			initialHash: ['H1', '6a09e667', 'H2', 'bb67ae85', 'H3', '3c6ef372', 'H4', 'a54ff53a', 'H5', '510e527f', 'H6', '9b05688c', 'H7', '1f83d9ab', 'H8', '5be0cd19']
 		}
+	}
+	getInfoStyles(prevStyles) {
+		let isOpen = this.props.blockState.isOpen;
+		const endvalue = prevStyles.map((_, i) => {
+			if (i === 0) {
+				if (isOpen) {
+					return { rotateY: spring(0, presets.wobbly) };
+				}
+				return { rotateY: prevStyles[0].rotateY };
+			} else {
+				return { rotateY: spring(Math.abs(prevStyles[i - 1].rotateY), presets.wobbly) };
+			}
+		});
+		return endvalue;
+	}
+
+	getInfoBlock(i, style) {
+		switch (i) {
+			case 0:
+				return (
+					<InfoBlock key={i} style={{ left: '880px', top: '100px' }} contentStyle={{ height: '150px', width: '250px' }} rotStyle={style} leftArrow={{}} rightArrow={{ display: 'none' }}>
+						These random looking words actually represent the first 32 bits of the fractional parts of the cube roots of the first 64 prime numbers. Whew.
+				</InfoBlock>
+				);
+			case 1:
+				return (
+					<InfoBlock key={i} style={{ right: '880px', top: '470px' }} contentStyle={{ height: '180px', width: '280px' }} rotStyle={style} leftArrow={{ display: 'none' }} rightArrow={{}}>
+						Like the numbers above, these too represent the first 32 bits of the fractional parts of the sqaure roots of the first eight prime numbers. Prime numbers everywhere.
+
+					</InfoBlock>
+				);
+		}
+
 	}
 
 	render() {
@@ -399,11 +414,20 @@ class Block3 extends React.Component {
 					<Table ncol={8} data={this.state.constants} />
 				</div>
 				<div className="element">
-					<div className="text2">Before the actual computation can begin, a default set of Hash values will be set which will subsequently be updated after every iteration of the core hashing algorithm. These are usually denoted using H<sub>1</sub>, H<sub>2</sub> etc. </div>
+					<div className="text2">Below is the default set of Hash values which will subsequently be updated after every iteration of the core hashing algorithm. These values are usually denoted using H<sub>1</sub>, H<sub>2</sub> etc. </div>
 				</div>
 				<div className="element">
 					<Table ncol={4} data={this.state.initialHash} />
 				</div>
+				<StaggeredMotion defaultStyles={[{ rotateY: 90 }, { rotateY: -90 }]} styles={this.getInfoStyles.bind(this)}>
+					{interpoStyles =>
+						<div>
+							{interpoStyles.map((style, i) => {
+								return this.getInfoBlock(i, style);
+							})}
+						</div>
+					}
+				</StaggeredMotion>
 			</Block>
 		);
 	}
@@ -411,6 +435,7 @@ class Block3 extends React.Component {
 }
 
 class Block4 extends React.Component {
+	// OUTER LOOP
 	constructor(props) {
 		super(props);
 		this.state = { msgSchInd: 16 };
@@ -429,39 +454,135 @@ class Block4 extends React.Component {
 	componentDidUpdate() {
 		//console.log(this.state.msgSchInd);
 		if (this.state.msgSchInd >= 20 && this.state.msgSchInd < 64) {
-			setTimeout(() => {
+			
 				this.setState((prevState) => {
 					prevState.msgSchInd++;
 					return prevState;
 				});
 
-			}, 500);
+			
 
 		}
 	}
+	getInfoStyles(prevStyles) {
+		let isOpen = this.props.blockState.isOpen;
+		const endvalue = prevStyles.map((_, i) => {
+			if (i === 0) {
+				if (isOpen) {
+					return { rotateY: spring(0, presets.wobbly), top: spring(450, { stiffness: 60, damping: 30 }) };
+				}
+				return { rotateY: prevStyles[0].rotateY };
+			} else {
+				return { rotateY: spring(Math.abs(prevStyles[i - 1].rotateY), presets.wobbly) };
+			}
+		});
+		return endvalue;
+	}
+	getInfoBlock(i, style) {
+		switch (i) {
+			case 0:
+				return (
+					<InfoBlock key={i} style={{ left: '1180px', top: style.top }} contentStyle={{ height: '170px', width: '250px' }} rotStyle={style} leftArrow={{}} rightArrow={{ display: 'none' }}>
+						Each new word in the message schedule is increasingly sensitive to changes in the initial message. Even a small change in the input message will drastically change the values you see here. This is called the Avalanche Effect and any reasonbly good hash algorithm will display this effect.
+				</InfoBlock>
+				);
+			case 1:
+				return (
+					<InfoBlock key={i} style={{ right: '1180px', top: '430px' }} contentStyle={{ height: '180px', width: '290px' }} rotStyle={style} leftArrow={{ display: 'none' }} rightArrow={{}}>
+						ROTR<sup>x</sup>: Right-rotate bits by x units.<br />
+						SHR<sup>x</sup>{putSpaces(2)}: Logical Right-shift bits by x {putSpaces(13)}units.<br />
+						&nbsp;&oplus;{putSpaces(5)} : Bitwise xor.<br /><br />
+						More info on bitwise operations <a href="https://en.wikipedia.org/wiki/Bitwise_operation#Logical_shift" target="_blank">here</a>
+
+					</InfoBlock>
+				);
+		}
+
+	}
+
+	getInfoForRender() {
+		if (this.state.msgSchInd > 30) {
+			return (
+				<StaggeredMotion defaultStyles={[{ rotateY: 90, top: 150 }, { rotateY: -90 }]} styles={this.getInfoStyles.bind(this)}>
+					{interpoStyles =>
+						<div>
+							{interpoStyles.map((style, i) => {
+								return this.getInfoBlock(i, style);
+							})}
+						</div>
+					}
+				</StaggeredMotion>
+			);
+		}
+	}
+	getFormula(indexList) {
+		return (
+			<div>
+			<div className="element">
+			<div className="text2">
+				<i>for i = 1 to 16: <br />
+				&nbsp;&nbsp;&nbsp;&nbsp;W<sub>i</sub> = M<sub>i</sub>&nbsp;&nbsp;&nbsp; \\M is the input message<br /><br />
+				for i = 17 to 64:<br />
+				&nbsp;&nbsp;&nbsp;&nbsp; W<sub>{indexList[0]+3}</sub> = &nbsp;&sigma;<sub>1</sub>(W<sub>{indexList[0] + 1}</sub>|{this.props.blockState.msgSch[indexList[0]]})
+				+
+				W<sub>{indexList[1] + 1}</sub>|{this.props.blockState.msgSch[indexList[1]]}&nbsp;
+				+<br/>
+				{putSpaces(15)}&sigma;<sub>1</sub>(W<sub>{indexList[2] + 1}</sub>|{this.props.blockState.msgSch[indexList[2]]})
+				+
+				W<sub>{indexList[3] + 1}</sub>|{this.props.blockState.msgSch[indexList[3]]}</i>
+			</div>
+			</div>
+			<div className="element">
+			<div className="text2">
+				Where,<br/>
+				<i>&sigma;<sub>0</sub>(x) = ROTR<sub>1</sub>(x) &oplus; ROTR<sub>8</sub>(x) &oplus; SHR<sub>7</sub>(x)</i><br/>
+				<i>&sigma;<sub>1</sub>(x) = ROTR<sub>19</sub>(x) &oplus; ROTR<sub>61</sub>(x) &oplus; SHR<sub>6</sub>(x)</i><br/>
+				The message schedule is recalculated for every 512-bit message block in the input.
+			</div>
+			</div>
+			</div>
+		);
+	}
+
 	render() {
-		var indexList = [this.state.msgSchInd - 2, this.state.msgSchInd - 7, this.state.msgSchInd - 15, this.state.msgSchInd - 16];
-		//console.log(this.props.blockState.msgSch);
+		var msgSchInd = this.state.msgSchInd;
+		if(msgSchInd>63) msgSchInd--;
+		var indexList = [msgSchInd - 2, msgSchInd - 7, msgSchInd - 15, msgSchInd - 16];
 		return (
 			<Block blockState={this.props.blockState} style={this.props.style} onClick={this.props.onClick}>
 				<div className=" element gridWrapper">
 					<div className="innerBlock outerBlockShadow">
-						<div className="element">ROTR<sup>19</sup>({this.props.blockState.msgSch[indexList[0]]}) XOR ROTR<sup>61</sup>({this.props.blockState.msgSch[indexList[0]]}) XOR SHR<sup>6</sup>({this.props.blockState.msgSch[indexList[0]]})</div>
-						<div className="element">+</div>
-						<div className="element">{this.props.blockState.msgSch[indexList[1]]}</div>
-						<div className="element">+</div>
-						<div className="element">ROTR<sup>7</sup>({this.props.blockState.msgSch[indexList[2]]}) XOR ROTR<sup>7</sup>({this.props.blockState.msgSch[indexList[2]]}) XOR SHR<sup>7</sup>({this.props.blockState.msgSch[indexList[2]]})</div>
-						<div className="element">+</div>
-						<div className="element">{this.props.blockState.msgSch[indexList[3]]}</div>
-					</div>
-					<div onClick={this.onClick.bind(this)} className="innerButton outerBlockShadow">Calculate >><br />{20 - this.state.msgSchInd}</div>
-					<div className="innerBlock outerBlockShadow" style={{overflow:'auto'}}>
 						<div className="element">
-						<Table ncol={2} data={this.props.blockState.msgSch.slice(0, this.state.msgSchInd)} />
+							<div className="text2">Welcome to the Trapdoor. It is here the message and the constants will be shuffled, juggled around and mixed together to form that random looking final hash. <br /> For every message block, a set of sixty four 32 bit-words called the Message Schedule is created using the following function:  </div>
+						</div>
+						
+						{this.getFormula(indexList)}
+						
+					</div>
+					<div onClick={this.onClick.bind(this)} className="innerButton outerBlockShadow">Calculate >><br />{Math.max(20 - this.state.msgSchInd,0)}</div>
+					<div className="innerBlock outerBlockShadow" style={{ overflow: 'auto', overflowX: 'hidden' }}>
+						<div className="element">
+							<Table ncol={2} data={this.props.blockState.msgSch.slice(0, this.state.msgSchInd)} colorList={indexList} enum={'W'} />
 						</div>
 					</div>
 				</div>
+				{this.getInfoForRender()}
 			</Block>
+		);
+	}
+}
+
+class Block5 extends React.Component{
+	constructor(props){
+		super(props);
+	}
+
+	render(){
+
+		return(
+		<Block blockState={this.props.blockState} style={this.props.style} onClick={this.props.onClick}>
+			bleh
+		</Block>
 		);
 	}
 }
@@ -471,24 +592,32 @@ class Table extends React.Component {
 		super(props);
 	}
 
-	getStyle(col){
-		var col = new Array(this.props.ncol+1).join(' 1fr ');
+	getStyle(col) {
+		var col = new Array(this.props.ncol + 1).join(' 1fr ');
 		return {
 			gridTemplateColumns: col
-				};
+		};
+	}
+
+	getCellStyle(index) {
+		if (this.props.colorList) {
+			return this.props.colorList.includes(index) ? { backgroundColor: 'rgb(127, 36, 183)', color:'bisque' } : {};
+		}
+	}
+
+	enumerateItem(index,item){
+		if(this.props.enum){
+			return (<div>{this.props.enum}<sub>{index+1}</sub> : {item}</div>);
+		}else return(<div>{item}</div>)
 	}
 
 	render() {
 		let ncol = this.props.ncol;
-		let data = resize(this.props.data, Math.ceil(this.props.data.length * 1.0 / ncol) * ncol, '');
-		let tableData = [];
-		for (var i = 0; i < data.length / ncol; i++) {
-			tableData[i] = data.slice(ncol * i, ncol * (i + 1));
-		}
+		let data = this.props.data;
 		//console.log(data);
 		return (
 			<div className="tableContainer" style={this.getStyle(this.props.ncol)}>
-				{data.map((item, index) =><div className="tableItem" key={index}>{item}</div>)}
+				{data.map((item, index) => <div className="tableItem" key={index} style={this.getCellStyle(index)}>{this.enumerateItem(index,item)}</div>)}
 			</div>
 		);
 	}
@@ -499,14 +628,26 @@ class InfoBlock extends React.Component {
 	constructor(props) {
 		super(props);
 	}
+	getInfoComponentStyles(style) {
+
+		return {
+			WebkitTransform: `rotateY(${style.rotateY}deg)`,
+			transform: `rotateY(${style.rotateY}deg)`,
+			display: 'flex'
+		};
+
+	}
+
 	render() {
 		//console.log(this.props.rot.transform);
 		return (
 			<div className="infoBlock" style={this.props.style}>
-				<div style={this.props.rot}>
+				<div style={this.getInfoComponentStyles(this.props.rotStyle)}>
 					<div className="leftArrow dropShadow" style={this.props.leftArrow} />
 					<div className="infoBlockContent dropShadow" style={this.props.contentStyle}>
+						<div className="infoText">
 						{this.props.children}
+						</div>
 					</div>
 					<div className="rightArrow dropShadow" style={this.props.rightArrow} />
 				</div>
@@ -515,14 +656,14 @@ class InfoBlock extends React.Component {
 	}
 }
 
-class Button extends React.Component{
+class Button extends React.Component {
 	constructor(props) {
 		super(props);
 	}
-	render(){
-		return(
+	render() {
+		return (
 			<div className="button" style={this.props.style} onClick={this.props.onClick}>
-				{this.props.label}
+				<div style={{ userSelect: 'none' }}>{this.props.label}</div>
 			</div>
 		);
 	}

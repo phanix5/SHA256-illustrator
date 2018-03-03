@@ -2,6 +2,10 @@
     outline: none;
 }
 
+body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  }
+
 .outerBlockShadow{
     -moz-box-shadow: 0px 4px 14px 8px rgba(0, 0, 0,0.3);
     -webkit-box-shadow: 0px 4px 14px 8px rgba(0, 0, 0, .3);
@@ -100,6 +104,18 @@
     font-size: 30px;
     margin: 1px;
 }
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: rgba(169, 169, 169, 0.7);
+  }
+  ::-moz-placeholder { /* Firefox 19+ */
+    color: rgba(169, 169, 169, 0.7);
+  }
+  :-ms-input-placeholder { /* IE 10+ */
+    color: rgba(169, 169, 169, 0.7);
+  }
+  :-moz-placeholder { /* Firefox 18- */
+    color: rgba(169, 169, 169, 0.7);
+  }
 .textBox2{
     display: inline-block;
 	width: 155px;
@@ -119,13 +135,18 @@
 .infoBlockContent{
     width: 200px;
     height: 200px;
-    background-color: rgb(211, 56, 56);
+    background-color: rgb(42, 165, 42);
     border-radius: 2px;
     padding:10px;
     z-index: 1;
-    font-size: 17px;
     text-align: left;
 
+}
+.infoText{
+    font-size: 17px;
+    padding: 7px;
+    background-color:rgb(27, 107, 27);
+    color: bisque;
 }
 .leftArrow{
     width: 0px;
@@ -133,7 +154,7 @@
     border-top: 50px solid transparent;
     border-bottom: 50px solid transparent; 
     vertical-align: top;
-    border-right:50px solid rgb(211, 56, 56); 
+    border-right:50px solid rgb(42, 165, 42);
     margin-top: 15px;
     z-index: 1;
 }
@@ -143,7 +164,7 @@
     border-top: 50px solid transparent;
     border-bottom: 50px solid transparent; 
     vertical-align: top;
-    border-left:50px solid rgb(211, 56, 56); 
+    border-left:50px solid rgb(42, 165, 42);
     margin-top: 15px;
     z-index: 1;
 }
@@ -154,7 +175,7 @@
 
 .gridWrapper{
   display: grid;
-  grid-template-columns: 4fr 1fr 4fr;
+  grid-template-columns: 4fr 1fr 3fr;
   grid-gap: 20px;
   grid-auto-rows: 100px;
   margin: 20px;
@@ -175,6 +196,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    color: bisque;
 }
 .tableContainer{
     display: grid;
@@ -184,6 +208,9 @@
 }
 .tableItem{
     background-color: aliceblue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .button{

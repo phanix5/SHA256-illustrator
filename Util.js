@@ -65,5 +65,9 @@ function generateMessageSchedule(m){
     }
     return W;
 }
+function putSpaces(n){
+    var pad = new Array(n+1).join('\xa0');
+    return pad;
+}
 
-export {resize,padZeros,preProcess,bitRepresentation,generateMessageSchedule};
+export {resize,padZeros,preProcess,bitRepresentation,generateMessageSchedule,putSpaces};
