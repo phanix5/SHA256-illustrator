@@ -12,7 +12,7 @@ function Sigma1256(x) { return (S(x, 6) ^ S(x, 11) ^ S(x, 25)); }
 function Gamma0256(x) { return (S(x, 7) ^ S(x, 18) ^ R(x, 3)); }
 function Gamma1256(x) { return (S(x, 17) ^ S(x, 19) ^ R(x, 10)); }
 
-function SHA256(s){
+function SHA256(s,iter){
 	var chrsz  = 8;
 	var hexcase = 0;
 	function core_sha256 (m, l) {
@@ -45,6 +45,7 @@ function SHA256(s){
 				c = b;
 				b = a;
 				a = safe_add(T1, T2);
+				if(j==iter)return new Array(T1,T2,h,g,f,e,d,c,b,a);
 			}
 			HASH[0] = safe_add(a, HASH[0]);
 			HASH[1] = safe_add(b, HASH[1]);
