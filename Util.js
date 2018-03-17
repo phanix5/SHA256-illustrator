@@ -69,5 +69,21 @@ function putSpaces(n){
     var pad = new Array(n+1).join('\xa0');
     return pad;
 }
+function rgb2hex(rgb) {
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    function hex(x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
+    }
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+}
+function parseCssRgb(rgb){
+    var res = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    if(res)return res.map((item,index)=>{return parseInt(item)}).slice(1,3);
+    else{
+        // hex values
+        res = rgb.slice(1,7).match(/.{1,2}/g).map((item,ind)=>parseInt(item,16));
+    }
+    return res;
+}
 
-export {resize,padZeros,preProcess,bitRepresentation,generateMessageSchedule,putSpaces};
+export {resize,padZeros,preProcess,bitRepresentation,generateMessageSchedule,putSpaces,rgb2hex,parseCssRgb};

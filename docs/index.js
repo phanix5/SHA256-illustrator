@@ -19439,10 +19439,11 @@ var App = function (_React$Component) {
 	}, {
 		key: 'getComponentStyle',
 		value: function getComponentStyle(style, index) {
-			var r = Math.round(165 + 50 - Math.abs(style.highLight));
-			var g = Math.round(32 + 50 - Math.abs(style.highLight));
-			var b = Math.round(32 + 50 - Math.abs(style.highLight));
-			//console.log(b);
+			var rgb = getComputedStyle(document.body).getPropertyValue('--block-color');
+			rgb = (0, _Util.parseCssRgb)(rgb.toString().trim());
+			var r = Math.round(rgb[1] + 50 - Math.abs(style.highLight));
+			var g = Math.round(rgb[2] + 50 - Math.abs(style.highLight));
+			var b = Math.round(rgb[3] + 50 - Math.abs(style.highLight));
 			return {
 				WebkitTransform: 'translate3d(' + style.x + 'px, ' + style.y + 'px, 0)',
 				transform: 'translate3d(' + style.x + 'px, ' + style.y + 'px, 0)',
@@ -19623,7 +19624,7 @@ var Block2 = function (_React$Component4) {
 				case 1:
 					return _react2.default.createElement(
 						'div',
-						null,
+						{ key: i },
 						_react2.default.createElement(
 							InfoBlock,
 							{ key: i, style: { right: '670px', top: '310px' }, contentStyle: { height: '160px', width: '300px' }, rotStyle: style, leftArrow: { display: 'none' }, rightArrow: {} },
@@ -22450,6 +22451,25 @@ function putSpaces(n) {
     var pad = new Array(n + 1).join('\xa0');
     return pad;
 }
+function rgb2hex(rgb) {
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    function hex(x) {
+        return ("0" + parseInt(x).toString(16)).slice(-2);
+    }
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+}
+function parseCssRgb(rgb) {
+    var res = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    if (res) return res.map(function (item, index) {
+        return parseInt(item);
+    }).slice(1, 3);else {
+        // hex values
+        res = rgb.slice(1, 7).match(/.{1,2}/g).map(function (item, ind) {
+            return parseInt(item, 16);
+        });
+    }
+    return res;
+}
 
 exports.resize = resize;
 exports.padZeros = padZeros;
@@ -22457,6 +22477,8 @@ exports.preProcess = preProcess;
 exports.bitRepresentation = bitRepresentation;
 exports.generateMessageSchedule = generateMessageSchedule;
 exports.putSpaces = putSpaces;
+exports.rgb2hex = rgb2hex;
+exports.parseCssRgb = parseCssRgb;
 
 /***/ })
 /******/ ]);

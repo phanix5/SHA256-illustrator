@@ -6,6 +6,12 @@ body {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     background-image: url('../img/body-bg.png');
     background-repeat: repeat;
+    --block-color: rgb(165,42,42); 
+    --text-bg-color: rgb(114, 29, 29);
+    --infoblock-color: rgb(42, 165, 42);
+    --innerblocksection-color: rgb(139, 28, 28);
+    --tablebg-color: rgb(240, 248, 255);
+    --text-color: rgb(255, 228, 196);
   }
 textarea{
     font-size: 30px;
@@ -50,7 +56,7 @@ textarea{
     margin:20px;  
 }
 #block1{
-    background-color: brown;
+    background-color: var(--block-color,brown);
     
 }
 .block6{
@@ -58,7 +64,7 @@ textarea{
 }
 
 #block2{
-    background-color: brown;
+    background-color: var(--block-color,brown);
     
 }
 
@@ -97,8 +103,8 @@ textarea{
 }
 
 .text2{
-    background-color: rgb(114, 29, 29);
-    color: bisque;
+    background-color: var(--text-bg-color);
+    color: var(--text-color);
     padding: 10px; 
     font-size: 20px;
     border-radius: 2px;
@@ -143,7 +149,7 @@ textarea{
 .infoBlockContent{
     width: 200px;
     height: 200px;
-    background-color: rgb(42, 165, 42);
+    background-color: var(--infoblock-color);
     border-radius: 2px;
     padding:10px;
     z-index: 1;
@@ -153,8 +159,8 @@ textarea{
 .infoText{
     font-size: 17px;
     padding: 7px;
-    background-color:rgb(27, 107, 27);
-    color: bisque;
+    background-color:var(--infoblock-color);
+    color: var(--text-color);
 }
 .leftArrow{
     width: 0px;
@@ -162,7 +168,7 @@ textarea{
     border-top: 50px solid transparent;
     border-bottom: 50px solid transparent; 
     vertical-align: top;
-    border-right:50px solid rgb(42, 165, 42);
+    border-right:50px solid var(--infoblock-color);
     margin-top: 15px;
     z-index: 1;
 }
@@ -172,7 +178,7 @@ textarea{
     border-top: 50px solid transparent;
     border-bottom: 50px solid transparent; 
     vertical-align: top;
-    border-left:50px solid rgb(42, 165, 42);
+    border-left:50px solid var(--infoblock-color);
     margin-top: 15px;
     z-index: 1;
 }
@@ -193,20 +199,20 @@ textarea{
     height: 100%;
     width:100%;
     grid-row: 1/span 5;
-    background-color: rgb(139, 28, 28);
+    background-color: var(--innerblocksection-color);
     text-align: center;
 }
 .innerButton{
     height: 50px;
     width: 100%;
     grid-row-start: 3;
-    background-color: rgb(139, 28, 28);
+    background-color: var(--innerblocksection-color);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     user-select: none;
-    color: bisque;
+    color: var(--text-color);
 }
 .tableContainer{
     display: grid;
@@ -215,7 +221,7 @@ textarea{
     
 }
 .tableItem{
-    background-color: aliceblue;
+    background-color: var(--tablebg-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -242,7 +248,7 @@ textarea{
 .circle {
 	width: 130px;
 	height: 130px;
-	background: brown;
+	background: var(--block-color);
 	-moz-border-radius: 65px;
 	-webkit-border-radius: 65px;
     border-radius: 65px;

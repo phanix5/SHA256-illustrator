@@ -1,7 +1,7 @@
 import React from 'react';
 import { Motion, StaggeredMotion, spring, presets } from 'react-motion';
 import { SHA256, str2binb, Utf8Encode, binb2hex } from './sha256';
-import { resize, padZeros, preProcess, bitRepresentation, generateMessageSchedule, putSpaces } from './Util';
+import { resize, padZeros, preProcess, bitRepresentation, generateMessageSchedule, putSpaces, rgb2hex, parseCssRgb } from './Util';
 
 
 
@@ -182,10 +182,11 @@ class App extends React.Component {
 	}
 
 	getComponentStyle(style, index) {
-		var r = Math.round(165 + 50 - Math.abs(style.highLight));
-		var g = Math.round(32 + 50 - Math.abs(style.highLight));
-		var b = Math.round(32 + 50 - Math.abs(style.highLight));
-		//console.log(b);
+		var rgb = getComputedStyle(document.body).getPropertyValue('--block-color');
+		rgb = (parseCssRgb(rgb.toString().trim()));
+		var r = Math.round(rgb[1] + 50 - Math.abs(style.highLight));
+		var g = Math.round(rgb[2] + 50 - Math.abs(style.highLight));
+		var b = Math.round(rgb[3] + 50 - Math.abs(style.highLight));
 		return {
 			WebkitTransform: `translate3d(${style.x}px, ${style.y}px, 0)`,
 			transform: `translate3d(${style.x}px, ${style.y}px, 0)`,
@@ -321,7 +322,7 @@ class Block2 extends React.Component {
 				);
 			case 1:
 				return (
-					<div>
+					<div key={i}>
 					<InfoBlock key={i} style={{ right: '670px', top: '310px' }} contentStyle={{ height: '160px', width: '300px' }} rotStyle={style} leftArrow={{ display: 'none' }} rightArrow={{}}>
 						<div>The 512-bit message block is split into sixteen integers of 32-bit 'words'. You are looking at the integer values represented by each of the 32 bit blocks from your message.<br />You can use the toggle button below to switch between integer and hex values.</div>
 						
